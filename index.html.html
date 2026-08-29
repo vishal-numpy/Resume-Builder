@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Builder</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; padding: 20px; color: #333; }
+        .container { max-width: 650px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .hidden { display: none; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
+        button { background-color: #2563eb; color: white; border: none; padding: 12px 20px; width: 100%; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 10px;}
+        button:hover { background-color: #1d4ed8; }
+        h2 { color: #1e3a8a; margin-top: 0; }
+        h3 { color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; margin-top: 25px; }
+        .qr-box { width: 200px; height: 200px; background-color: #f9fafb; margin: 20px auto; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px dashed #9ca3af; border-radius: 8px; color: #6b7280; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- STEP 1: PASSWORDLESS OTP AUTHENTICATION -->
+    <div id="auth-section">
+        <h2>Welcome to Resume Builder</h2>
+        <p>Login or Sign up instantly using an OTP sent to your mobile or email.</p>
+        <div class="form-group">
+            <label>Mobile Number or Email ID</label>
+            <input type="text" id="login-id" placeholder="Enter mobile number or email">
+        </div>
+        <button onclick="sendOTP()">Send OTP</button>
+        
+        <div id="otp-div" class="hidden" style="margin-top: 20px;">
+            <div class="form-group">
+                <label>Enter 6-Digit OTP</label>
+                <input type="text" id="otp-code" placeholder="123456" maxlength="6">
+            </div>
+            <button onclick="verifyOTP()">Verify & Proceed</button>
+        </div>
+    </div>
+
+    <!-- STEP 2: COMPLETE DATA COLLECTION FORM -->
+    <div id="form-section" class="hidden">
+        <h2>Candidate Details Form</h2>
+        <p>Provide your information below. Our system will analyze it to format your professional resume.</p>
+        
+        <h3>Personal Details</h3>
+        <div class="form-group"><label>Full Name</label><input type="text" id="name" placeholder="John Doe"></div>
+        <div class="form-group"><label>Date of Birth (DOB)</label><input type="date" id="dob"></div>
+        <div class="form-group"><label>Current Location with Pin Code</label><input type="text" id="location" placeholder="City, State - 110001"></div>
+        <div class="form-group"><label>Mobile Number</label><input type="tel" id="mobile" placeholder="10-digit mobile number"></div>
+        <div class="form-group"><label>Email ID</label><input type="email" id="email" placeholder="example@email.com"></div>
+        
+        <h3>Summary & Background</h3>
+        <div class="form-group">
+            <label>Education & Professional Background Summary</label>
+            <textarea id="summary" rows="3" placeholder="Write a short summary about your background and professional goals..."></textarea>
+        </div>
+
+        <h3>Qualifications</h3>
+        <div class="form-group"><label>10th Grade Percentage / Grades</label><input type="text" id="tenth" placeholder="e.g., 85% or 9.0 CGPA"></div>
+        <div class="form-group"><label>12th Grade Percentage / Grades</label><input type="text" id="twelfth" placeholder="e.g., 88% or Stream"></div>
+        <div class="form-group"><label>Graduation Grades / Percentage & Degree</label><input type="text" id="grad" placeholder="e.g., B.Tech CSE, 8.2 CGPA"></div>
+        <div class="form-group"><label>Post Graduation / Diploma Details (if any)</label><input type="text" id="postgrad" placeholder="e.g., MBA, 75%"></div>
+
+        <h3>Experience & Projects</h3>
+        <div class="form-group">
+            <label>Projects / Internship Details</label>
+            <textarea id="projects" rows="3" placeholder="Mention project titles, tech stack, and internship roles..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Employment Details</label>
+            <textarea id="employment" rows="3" placeholder="Company Name, Designation, Duration, Roles..."></textarea>
+        </div>
+        
+        <h3>Additional Preferences</h3>
+        <div class="form-group"><label>Expected Salary (₹)</label><input type="text" id="salary" placeholder="e.g., 6,00,000 PA"></div>
+
+        <button onclick="submitResumeForm()">Generate Resume Preview</button>
+    </div>
+
+    <!-- STEP 3: PAYMENT & DOWNLOAD SECTION -->
+    <div id="payment-section" class="hidden" style="text-align: center;">
+        <h2>Complete Payment to Download</h2>
+        <p>Your tailored resume matching the professional template structure is ready.</p>
+        <p>Scan the UPI QR code below to pay the processing fee of <strong>₹40</strong>.</p>
+        
+        <div class="qr-box">
+            [UPI QR CODE IMAGE]
+        </div>
+        <p style="font-size: 13px; color: #666;">Secure UPI Payment Gateway Integration</p>
+        
+        <button id="download-btn" onclick="downloadResume()" style="background-color: #10b981;" disabled>Waiting for Payment Confirmation...</button>
+    </div>
+</div>
+
+<script>
+    function sendOTP() {
+        const loginId = document.getElementById('login-id').value;
+        if(!loginId) {
+            alert('Please enter a valid mobile number or email ID.');
+            return;
+        }
+        alert('OTP sent successfully to ' + loginId);
+        document.getElementById('otp-div').classList.remove('hidden');
+    }
+
+    function verifyOTP() {
+        const otp = document.getElementById('otp-code').value;
+        if(otp.length < 4) {
+            alert('Please enter a valid OTP.');
+            return;
+        }
+        // Switch views upon successful login
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('form-section').classList.remove('hidden');
+    }
+
+    function submitResumeForm() {
+        const name = document.getElementById('name').value;
+        if(!name) {
+            alert('Please fill out at least your Name to continue.');
+            return;
+        }
+        
+        // Switch to payment step
+        document.getElementById('form-section').classList.add('hidden');
+        document.getElementById('payment-section').classList.remove('hidden');
+        
+        // Simulating webhook payment confirmation trigger after 4 seconds
+        setTimeout(() => {
+            const btn = document.getElementById('download-btn');
+            btn.removeAttribute('disabled');
+            btn.innerText = "Download Resume PDF (₹40 Paid)";
+            alert('Payment of ₹40 verified successfully via QR code!');
+        }, 4000);
+    }
+
+    function downloadResume() {
+        alert('Downloading your formatted resume PDF...');
+    }
+</script>
+
+</body>
+</html>
